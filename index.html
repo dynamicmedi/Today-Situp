@@ -1,0 +1,581 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>매일 복근 미션</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=IBM+Plex+Sans+KR:wght@400;500;600&family=Oswald:wght@500;600&display=swap">
+<style>
+/* Layout: one narrow training column — setup card stack, then a full-focus workout screen driven by phase color (상복부 cobalt / 하복부 teal / 코브라 amber). */
+:root{
+  --bg:#EDF0F4; --surface:#FFFFFF; --ink:#141A2E; --muted:#5A6377; --line:#D6DBE4; --soft:#E3E8F0;
+  --upper:#2347D6; --lower:#0C8574; --cobra:#C97C08; --rest:#5A6377;
+  --good:#1E8648; --bad:#BF3A2E; --on:#FFFFFF;
+  --f-display:"Black Han Sans","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-body:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-num:"Oswald","Arial Narrow",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1320; --surface:#181D2D; --ink:#E7EBF4; --muted:#9AA3B7; --line:#2A3146; --soft:#212842;
+  --upper:#7891FF; --lower:#3EC6B0; --cobra:#F0B449; --rest:#9AA3B7;
+  --good:#52C482; --bad:#F07467; --on:#0F1320; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F1320; --surface:#181D2D; --ink:#E7EBF4; --muted:#9AA3B7; --line:#2A3146; --soft:#212842;
+  --upper:#7891FF; --lower:#3EC6B0; --cobra:#F0B449; --rest:#9AA3B7;
+  --good:#52C482; --bad:#F07467; --on:#0F1320; color-scheme:dark}
+
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 40px}
+.app{max-width:540px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+button,a.mini,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--upper);outline-offset:2px}
+.num{font-family:var(--f-num);font-variant-numeric:tabular-nums;letter-spacing:.01em}
+
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px}
+.eyebrow{margin:0;color:var(--muted);font-size:13px;letter-spacing:.04em}
+h1{margin:2px 0 0;font-family:var(--f-display);font-weight:400;font-size:32px;line-height:1.1;text-wrap:balance}
+.streak{display:flex;flex-direction:column;align-items:flex-end;line-height:1}
+.streak .num{font-size:40px;font-weight:600;color:var(--upper)}
+.streak span:last-child{font-size:12px;color:var(--muted);margin-top:4px}
+
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);background:var(--soft);border-radius:12px;padding:4px;gap:4px}
+.tabs button{border:0;background:transparent;padding:9px 4px;border-radius:9px;font-weight:600;color:var(--muted)}
+.tabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(20,26,46,.12)}
+
+section{display:flex;flex-direction:column;gap:18px}
+.lbl{margin:0 0 8px;font-size:12px;font-weight:600;letter-spacing:.08em;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.seg button{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:2px}
+.seg button small{color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--bg)}
+.seg button[aria-pressed="true"] small{color:inherit;opacity:.75}
+
+.missions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mission{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.mission[aria-pressed="true"]{border-color:var(--upper);box-shadow:inset 0 0 0 1px var(--upper)}
+.m-k{font-size:13px;font-weight:600;color:var(--muted)}
+.mission[aria-pressed="true"] .m-k{color:var(--upper)}
+.m-big{font-family:var(--f-num);font-size:30px;font-weight:600;line-height:1.1}
+.m-s{font-size:12.5px;color:var(--muted);line-height:1.45}
+
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.opts label{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:600;letter-spacing:.06em;color:var(--muted)}
+select{background:var(--surface);border:1.5px solid var(--line);border-radius:10px;padding:10px;font-size:15px;font-weight:500;letter-spacing:0}
+
+.plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.pi{display:grid;grid-template-columns:30px 1fr auto;align-items:center;gap:10px;background:var(--surface);border-radius:12px;padding:10px 12px;border-left:4px solid var(--z)}
+.pi-n{font-family:var(--f-num);font-size:20px;color:var(--z);text-align:center}
+.pi-body{min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.pi-body b{font-weight:600}
+.tag{font-size:11.5px;font-weight:600;color:var(--z);letter-spacing:.04em}
+.reps{font-family:var(--f-num);color:var(--muted)}
+.pi-act{display:flex;gap:6px}
+.gap{font-size:12px;color:var(--muted);padding:5px 0 5px 25px;display:flex;align-items:center;gap:8px}
+.gap::before{content:"";width:2px;height:14px;background:var(--cobra);border-radius:2px}
+.gap b{color:var(--cobra);font-weight:600}
+.gap.rest::before{background:var(--line)}
+
+.mini{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;font-size:13px;font-weight:500;text-decoration:none;white-space:nowrap}
+.mini.yt{border-color:color-mix(in srgb,var(--bad) 45%,var(--line));color:var(--bad)}
+.mini.yt::before{content:"";width:0;height:0;border-left:7px solid currentColor;border-top:4.5px solid transparent;border-bottom:4.5px solid transparent}
+
+.cta{border:0;background:var(--ink);color:var(--bg);border-radius:14px;padding:16px;font-size:17px;font-weight:600;width:100%}
+.cta:active{transform:translateY(1px)}
+.ghost{border:1px solid var(--line);background:transparent;border-radius:12px;padding:12px;color:var(--muted);font-weight:500}
+.note{margin:0;font-size:12.5px;color:var(--muted);text-align:center}
+
+/* workout */
+.wk-top{display:flex;flex-direction:column;gap:8px}
+.mbar{height:10px;background:var(--soft);border-radius:6px;overflow:hidden}
+.mbar-fill{height:100%;width:0;background:var(--upper);border-radius:6px;transition:width .4s}
+.wk-stats{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:14px;color:var(--muted)}
+.wk-stats .num{font-size:18px;color:var(--ink)}
+.clock{font-family:var(--f-num);font-size:30px;font-weight:600;color:var(--ink)}
+.clock.paused{color:var(--muted)}
+.clock.warn{color:var(--bad)}
+.phase{background:var(--surface);border-radius:20px;padding:24px 20px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center;border-top:6px solid var(--z)}
+.ph-k{margin:0;font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--z)}
+.ph-name{margin:0;font-family:var(--f-display);font-weight:400;font-size:36px;line-height:1.15;text-wrap:balance}
+.ph-sub{margin:0;color:var(--muted)}
+.counter{display:flex;align-items:center;gap:18px}
+.counter button{width:56px;height:56px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);font-size:28px;line-height:1}
+.counter output{font-size:72px;font-weight:600;min-width:2.2ch;line-height:1}
+.hint{margin:0;font-size:12.5px;color:var(--muted)}
+.row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.ring{position:relative;width:200px;max-width:100%;aspect-ratio:1}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring-bg{stroke:var(--soft)}
+.ring-fg{stroke:var(--z);stroke-linecap:round;stroke-dasharray:339.29;transition:stroke-dashoffset .25s linear}
+.ring-t{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:2px}
+.ring-t .num{font-size:64px;font-weight:600;line-height:1}
+.ring-t small{color:var(--muted);margin-left:2px}
+.cue{margin:0;max-width:34ch;color:var(--ink);font-size:14.5px}
+.next{background:var(--bg);border-radius:12px;padding:10px 14px;font-size:14px;width:100%}
+.next b{font-weight:600}
+.btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+.btns button{border:1.5px solid var(--line);background:var(--bg);border-radius:12px;padding:12px;font-weight:600}
+.result-big{font-family:var(--f-num);font-size:64px;font-weight:600;line-height:1}
+.badge{font-size:13px;font-weight:600;padding:4px 12px;border-radius:999px;color:var(--on);background:var(--z)}
+
+/* guide */
+.g-group h2{margin:0 0 10px;font-family:var(--f-display);font-weight:400;font-size:22px;color:var(--z)}
+.g-group p.gd{margin:-6px 0 10px;font-size:13px;color:var(--muted)}
+.g-list{display:flex;flex-direction:column;gap:8px}
+.g-item{background:var(--surface);border-radius:12px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.g-item div:first-child{min-width:0}
+.g-item b{display:block;font-weight:600}
+.g-item span{font-size:12.5px;color:var(--muted)}
+
+/* log */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:2px}
+.stat .num{font-size:28px;font-weight:600}
+.stat span:last-child{font-size:12px;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;background:var(--surface);border-radius:12px;padding:12px}
+.day{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted)}
+.dot{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--line)}
+.dot.part{border-color:var(--cobra);background:color-mix(in srgb,var(--cobra) 25%,transparent)}
+.dot.ok{border-color:var(--good);background:var(--good)}
+.day.today{color:var(--ink);font-weight:600}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px;vertical-align:-1px}
+.hist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.hist li{background:var(--surface);border-radius:10px;padding:10px 14px;display:flex;justify-content:space-between;gap:10px;font-size:14px}
+.hist .ok{color:var(--good);font-weight:600}.hist .no{color:var(--cobra);font-weight:600}
+.empty{color:var(--muted);font-size:14px;margin:0}
+
+/* sheet */
+.sheet{position:fixed;inset:0;z-index:20;background:rgba(10,14,26,.55);display:flex;align-items:flex-end;justify-content:center;
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sheet-card{background:var(--surface);border-radius:20px;max-width:540px;width:100%;max-height:85%;overflow:auto;padding:22px 20px;display:flex;flex-direction:column;gap:14px;border-top:6px solid var(--z)}
+.sheet-card h3{margin:0;font-family:var(--f-display);font-weight:400;font-size:28px}
+.sheet-card ol{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:8px}
+.tip{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:14px}
+.tip b{color:var(--z)}
+.sheet-act{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.sheet-act .mini{justify-content:center;padding:12px;font-size:15px}
+@media (min-width:600px){.sheet{align-items:center}}
+.fig-wrap{background:var(--bg);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.fig{width:100%;height:auto;display:block;max-width:100%}
+.fig .mat{fill:var(--soft)}
+.fig line{stroke-linecap:round}
+.fig .limb{stroke:var(--ink);stroke-width:8}
+.fig .torso{stroke:var(--ink);stroke-width:11}
+.fig .back{stroke:var(--muted);stroke-width:7;opacity:.55}
+.fig .head{fill:var(--ink)}
+.fig .glow{fill:var(--z);opacity:.35}
+.fig .arc{fill:none;stroke:var(--z);stroke-width:2;stroke-dasharray:4 4}
+.fig-ctrl{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12.5px;color:var(--muted)}
+.fig-ctrl i{display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--z);opacity:.6;margin-right:4px;vertical-align:-1px}
+.fig-steps{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.fig-steps figure{margin:0;background:var(--surface);border-radius:10px;padding:6px 6px 8px;display:flex;flex-direction:column;gap:2px}
+.fig-steps figcaption{font-size:12px;color:var(--muted);text-align:center}
+.g-item .thumb{width:84px;flex:none;background:var(--bg);border-radius:8px;padding:2px}
+.g-item .g-txt{flex:1;min-width:0}
+@media (max-width:420px){.opts{grid-template-columns:1fr 1fr}.opts label:first-child{grid-column:1/-1}}
+@media (max-width:380px){.missions,.opts{grid-template-columns:1fr}.ph-name{font-size:30px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div><p class="eyebrow" id="today"></p><h1>매일 복근 미션</h1></div>
+    <div class="streak"><span class="num" id="streakN">0</span><span>일 연속 성공</span></div>
+  </header>
+
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="home" aria-selected="true">오늘의 미션</button>
+    <button role="tab" data-tab="guide" aria-selected="false">운동 가이드</button>
+    <button role="tab" data-tab="log" aria-selected="false">기록</button>
+  </nav>
+
+  <section id="v-home">
+    <div>
+      <h2 class="lbl">난이도</h2>
+      <div class="seg" id="levelSeg"></div>
+    </div>
+    <div>
+      <h2 class="lbl">미션 선택</h2>
+      <div class="missions">
+        <button class="mission" data-m="count" id="mCount" aria-pressed="true">
+          <span class="m-k">개수 미션</span><span class="m-big" id="mCountBig">120회</span>
+          <span class="m-s">휴식하면서 오늘 정한 총 개수를 끝까지 채웁니다</span>
+        </button>
+        <button class="mission" data-m="time" id="mTime" aria-pressed="false">
+          <span class="m-k">타임어택</span><span class="m-big" id="mTimeBig">4:30</span>
+          <span class="m-s" id="mTimeSub">제한 시간 안에 총 120회. 코브라·휴식 중엔 시계가 멈춥니다</span>
+        </button>
+      </div>
+    </div>
+    <div class="opts">
+      <label for="everySel">코브라 간격
+        <select id="everySel"><option value="2">2세트마다</option><option value="3">3세트마다</option><option value="4">4세트마다</option></select>
+      </label>
+    <label for="cobraSel">코브라 유지
+        <select id="cobraSel"><option value="15">15초</option><option value="20">20초</option><option value="30">30초</option></select>
+      </label>
+      <label for="restSel">세트 간 휴식
+        <select id="restSel"><option value="20">20초</option><option value="30">30초</option><option value="45">45초</option><option value="60">60초</option></select>
+      </label>
+    </div>
+    <div>
+      <h2 class="lbl"><span>오늘의 순서</span><span id="planMeta"></span></h2>
+      <ol class="plan" id="planList"></ol>
+    </div>
+    <button class="cta" id="startBtn">미션 시작</button>
+    <p class="note">운동 순서는 날짜마다 바뀝니다. 허리나 목에 통증이 느껴지면 바로 멈추세요.</p>
+  </section>
+
+  <section id="v-workout" hidden>
+    <div class="wk-top">
+      <div class="mbar"><div class="mbar-fill" id="mFill"></div></div>
+      <div class="wk-stats"><span><span class="num" id="wkCount">0</span> / <span id="wkTarget">120</span>회</span><span class="clock" id="wkClock"></span></div>
+    </div>
+    <div class="phase" id="phase"></div>
+    <button class="ghost" id="quitBtn">그만두기</button>
+  </section>
+
+  <section id="v-guide" hidden></section>
+  <section id="v-log" hidden></section>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-card" id="sheetCard" role="dialog" aria-modal="true" aria-labelledby="sheetTitle"></div>
+</div>
+
+<script>
+const EX={
+  crunch:{name:'크런치',zone:'upper',yt:'크런치 운동 방법 정확한 자세',
+    steps:['바닥에 등을 대고 누워 무릎을 90도 정도로 세우고 발바닥을 바닥에 붙입니다.','손끝을 귀 옆에 가볍게 대거나 가슴 앞에서 교차합니다.','숨을 내쉬며 명치를 골반 쪽으로 당긴다는 느낌으로, 어깨뼈가 바닥에서 떨어질 때까지 상체를 말아 올립니다.','위에서 1초 멈춘 뒤 숨을 들이쉬며 천천히 내려옵니다.'],
+    tip:'턱과 가슴 사이에 주먹 하나만큼 공간을 유지하세요. 손으로 머리를 당기면 목에 부담이 갑니다.'},
+  toetouch:{name:'토 터치 크런치',zone:'upper',yt:'토터치 크런치 운동 방법',
+    steps:['누운 상태에서 두 다리를 천장 방향으로 곧게 들어 올립니다. 햄스트링이 당기면 무릎을 살짝 굽혀도 됩니다.','두 팔을 천장 쪽으로 뻗습니다.','숨을 내쉬며 상체를 말아 올려 손끝을 발끝 쪽으로 뻗습니다.','천천히 내려오되 어깨가 바닥에 완전히 닿기 직전에 다음 반복을 시작합니다.'],
+    tip:'다리가 앞뒤로 흔들리지 않게 고정하고, 팔이 아니라 상복부로 몸을 들어 올립니다.'},
+  bicycle:{name:'바이시클 크런치',zone:'upper',yt:'바이시클 크런치 운동 방법',
+    steps:['누워서 손끝을 귀 옆에 대고, 다리를 들어 무릎과 고관절을 각각 90도로 만듭니다.','어깨를 살짝 들어 올린 상태에서 오른쪽 팔꿈치를 왼쪽 무릎 쪽으로 비틀고, 동시에 오른 다리를 앞으로 뻗습니다.','반대쪽으로 바꿔 왼쪽 팔꿈치를 오른쪽 무릎 쪽으로 가져옵니다.','좌우 한 번씩을 합쳐 1회로 셉니다.'],
+    tip:'팔꿈치만 흔들지 말고 어깨 전체가 회전한다는 느낌으로 천천히 합니다. 상복부와 옆구리를 함께 씁니다.'},
+  heeltouch:{name:'힐 터치',zone:'upper',yt:'힐터치 복근 운동 방법',
+    steps:['무릎을 세우고 누워 발을 엉덩이 너비보다 조금 넓게 둡니다.','어깨를 바닥에서 살짝 들어 올리고 그 높이를 유지합니다.','몸통을 옆으로 굽혀 오른손으로 오른발 뒤꿈치를 터치합니다.','반대로 왼손으로 왼발 뒤꿈치를 터치합니다. 좌우 합쳐 1회입니다.'],
+    tip:'반복하는 동안 어깨를 바닥에 내려놓지 않아야 상복부 긴장이 유지됩니다.'},
+  legraise:{name:'레그 레이즈',zone:'lower',yt:'레그레이즈 하복부 운동 방법',
+    steps:['누워서 손바닥을 엉덩이 옆 바닥에 두거나 엉덩이 아래에 받칩니다.','두 다리를 붙이고, 숨을 내쉬며 바닥과 90도가 될 때까지 들어 올립니다.','숨을 들이쉬며 천천히 내리되, 발이 바닥에 닿기 직전에 멈춥니다.','다시 들어 올리며 반복합니다.'],
+    tip:'허리가 바닥에서 뜨면 무릎을 살짝 굽히거나 내리는 범위를 줄이세요. 반동 없이 천천히 내리는 구간이 핵심입니다.'},
+  reverse:{name:'리버스 크런치',zone:'lower',yt:'리버스 크런치 운동 방법',
+    steps:['누워서 손은 몸 옆 바닥에 두고, 다리를 들어 무릎을 90도로 굽힙니다.','숨을 내쉬며 아랫배로 골반을 말아 올려 무릎을 가슴 쪽으로 가져옵니다. 엉덩이가 바닥에서 살짝 뜹니다.','1초 멈춘 뒤 천천히 시작 자세로 돌아옵니다.'],
+    tip:'다리를 던지듯 반동을 쓰지 말고, 꼬리뼈를 말아 올린다는 느낌으로 하복부를 씁니다.'},
+  flutter:{name:'플러터 킥',zone:'lower',yt:'플러터킥 운동 방법',
+    steps:['누워서 손을 엉덩이 옆이나 아래에 둡니다.','두 다리를 붙인 채 바닥에서 15~20cm 들어 올립니다.','무릎을 편 상태로 다리를 위아래로 작게 번갈아 찹니다.','좌우 한 번씩을 합쳐 1회로 셉니다.'],
+    tip:'허리가 뜨면 다리를 조금 더 높이 들어 각도를 줄이세요. 호흡을 멈추지 않습니다.'},
+  kneetuck:{name:'시티드 니 턱',zone:'lower',yt:'시티드 니업 운동 방법',
+    steps:['바닥에 앉아 손을 엉덩이 뒤에 짚고 상체를 45도쯤 뒤로 기울입니다.','다리를 모아 바닥에서 들고 앞으로 뻗습니다.','숨을 내쉬며 무릎을 가슴 쪽으로 당기고, 상체도 살짝 앞으로 가져옵니다.','다시 다리를 뻗으며 반복합니다.'],
+    tip:'다리를 뻗을 때 발이 바닥에 닿지 않게 유지하면 하복부 자극이 끊기지 않습니다.'},
+  cobra:{name:'코브라 자세',zone:'cobra',yt:'코브라 자세 복근 스트레칭',
+    steps:['엎드린 자세에서 손바닥을 어깨 아래 바닥에 두고, 다리는 골반 너비로 벌려 발등을 바닥에 댑니다.','숨을 들이쉬며 팔을 천천히 펴서 가슴을 들어 올립니다. 골반과 허벅지는 바닥에 그대로 둡니다.','어깨는 귀에서 멀리 내리고, 시선은 정면이나 약간 위를 봅니다.','복부 앞쪽이 길게 늘어나는 느낌으로 편하게 호흡하며 유지합니다.'],
+    tip:'허리가 불편하면 팔꿈치를 바닥에 대는 스핑크스 자세로 강도를 낮추세요. 통증이 있으면 바로 내려옵니다.'}
+};
+const UPPER=['crunch','toetouch','bicycle','heeltouch'], LOWER=['legraise','reverse','flutter','kneetuck'];
+const ZONE={upper:{label:'상복부',v:'var(--upper)'},lower:{label:'하복부',v:'var(--lower)'},cobra:{label:'회복 스트레칭',v:'var(--cobra)'}};
+const LEVELS={
+  beg:{label:'초급',sets:4,reps:15,limit:150},
+  mid:{label:'중급',sets:6,reps:20,limit:270},
+  adv:{label:'고급',sets:8,reps:25,limit:390}
+};
+const $=id=>document.getElementById(id);
+const ytUrl=q=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+const fmt=s=>{s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const pad=n=>String(n).padStart(2,'0');
+const keyOf=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const TODAY=keyOf(new Date());
+
+function load(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
+function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+let cfg=Object.assign({level:'mid',mission:'count',cobra:20,rest:30,every:3},load('abs.cfg',{}));
+const cobraEvery=len=>len<6?Math.ceil(len/2):cfg.every;
+const cobraAfter=(i,len,ev=cobraEvery(len))=>(i+1)%ev===0||i===len-1;
+let hist=load('abs.hist',{});
+
+/* daily rotation */
+function hashStr(s){let h=2166136261;for(const c of s){h^=c.charCodeAt(0);h=Math.imul(h,16777619)}return h>>>0}
+function rng(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffle(arr,r){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function buildPlan(level){
+  const L=LEVELS[level],r=rng(hashStr(TODAY+level)),u=shuffle(UPPER,r),l=shuffle(LOWER,r),out=[];
+  for(let k=0;k<L.sets;k++){const idx=Math.floor(k/2)%4;out.push({id:k%2===0?u[idx]:l[idx],reps:L.reps})}
+  return out;
+}
+
+/* UI: header */
+(function(){const d=new Date(),w='일월화수목금토'[d.getDay()];$('today').textContent=`${d.getMonth()+1}월 ${d.getDate()}일 ${w}요일`})();
+function streak(){let d=new Date(),n=0;if(!(hist[keyOf(d)]||{}).success)d.setDate(d.getDate()-1);
+  while((hist[keyOf(d)]||{}).success){n++;d.setDate(d.getDate()-1)}return n}
+function renderStreak(){$('streakN').textContent=streak()}
+
+/* tabs */
+let tab='home',inWorkout=false;
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('[data-tab]');if(b)showTab(b.dataset.tab)});
+function showTab(t){tab=t;
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.tab===t));
+  $('v-home').hidden=!(t==='home'&&!inWorkout);$('v-workout').hidden=!(t==='home'&&inWorkout);
+  $('v-guide').hidden=t!=='guide';$('v-log').hidden=t!=='log';
+  if(t==='log')renderLog();
+}
+
+/* home */
+function renderHome(){
+  $('levelSeg').innerHTML=Object.entries(LEVELS).map(([k,L])=>`<button data-lv="${k}" aria-pressed="${cfg.level===k}">${L.label}<small>${L.sets}세트 · ${L.reps}회</small></button>`).join('');
+  const L=LEVELS[cfg.level],total=L.sets*L.reps;
+  $('mCountBig').textContent=total+'회';
+  $('mTimeBig').textContent=fmt(L.limit);
+  $('mTimeSub').textContent=`제한 시간 안에 총 ${total}회. 코브라·휴식 중엔 시계가 멈춥니다`;
+  $('mCount').setAttribute('aria-pressed',cfg.mission==='count');$('mTime').setAttribute('aria-pressed',cfg.mission==='time');
+  $('cobraSel').value=cfg.cobra;$('restSel').value=cfg.rest;$('everySel').value=cfg.every;
+  const plan=buildPlan(cfg.level);
+  const ev=cobraEvery(plan.length);
+  $('planMeta').textContent=`상복부 ${plan.filter(p=>EX[p.id].zone==='upper').length} · 하복부 ${plan.filter(p=>EX[p.id].zone==='lower').length} · 코브라 ${ev}세트마다${plan.length<6?'(절반 지점)':''}`;
+  $('planList').innerHTML=plan.map((p,i)=>{const e=EX[p.id],z=ZONE[e.zone];
+    return `<li class="pi" style="--z:${z.v}"><span class="pi-n">${i+1}</span><div class="pi-body"><span class="tag">${z.label}</span><b>${e.name}</b><span class="reps">${p.reps}회</span></div><div class="pi-act"><button class="mini" data-how="${p.id}">방법</button><a class="mini yt" href="${ytUrl(e.yt)}" target="_blank" rel="noopener">유튜브</a></div></li>`+
+      (i===plan.length-1?`<li class="gap"><b>코브라 ${cfg.cobra}초</b> → 미션 완료</li>`
+       :cobraAfter(i,plan.length)?`<li class="gap"><b>코브라 ${cfg.cobra}초</b> → 휴식 ${cfg.rest}초</li>`
+       :`<li class="gap rest">휴식 ${cfg.rest}초</li>`)}).join('');
+}
+$('levelSeg').addEventListener('click',e=>{const b=e.target.closest('[data-lv]');if(!b)return;cfg.level=b.dataset.lv;save('abs.cfg',cfg);renderHome()});
+document.querySelectorAll('.mission').forEach(b=>b.addEventListener('click',()=>{cfg.mission=b.dataset.m;save('abs.cfg',cfg);renderHome()}));
+$('cobraSel').addEventListener('change',e=>{cfg.cobra=+e.target.value;save('abs.cfg',cfg);renderHome()});
+$('restSel').addEventListener('change',e=>{cfg.rest=+e.target.value;save('abs.cfg',cfg);renderHome()});
+$('everySel').addEventListener('change',e=>{cfg.every=+e.target.value;save('abs.cfg',cfg);renderHome()});
+
+/* guide */
+function renderGuide(){
+  const grp=(zone,ids,desc)=>`<div class="g-group" style="--z:${ZONE[zone].v}"><h2>${ZONE[zone].label}</h2><p class="gd">${desc}</p><div class="g-list">${ids.map(id=>`<div class="g-item"><div class="thumb">${figSVG(id,'b')}</div><div class="g-txt"><b>${EX[id].name}</b><span>${EX[id].steps.length}단계 설명 · 동작 그림</span></div><div class="pi-act"><button class="mini" data-how="${id}">운동방법 설명</button><a class="mini yt" href="${ytUrl(EX[id].yt)}" target="_blank" rel="noopener">유튜브 시청</a></div></div>`).join('')}</div></div>`;
+  $('v-guide').innerHTML=grp('upper',UPPER,'상체(흉곽)를 골반 쪽으로 말아 올리는 동작. 복직근 윗부분을 주로 씁니다.')+
+    grp('lower',LOWER,'다리와 골반을 몸통 쪽으로 끌어오는 동작. 복직근 아랫부분과 고관절 굴곡근을 씁니다.')+
+    grp('cobra',['cobra'],'복근 운동을 몇 세트(기본 3세트, 총 6세트 미만이면 절반) 마칠 때마다 반대 방향으로 몸을 젖혀 수축된 복근을 늘려 줍니다.');
+}
+
+/* figure illustrations: side view, head on the left, floor at y≈112 */
+const B={head:[52,100],sh:[70,106],hip:[130,106]};
+const ARMS_FLOOR={elbow:[98,108],hand:[122,108]};
+const POSE={
+  crunch:{cap:['누운 시작 자세','상체 말아 올리기'],
+    a:{...B,knee:[155,78],ankle:[178,106],elbow:[74,92],hand:[58,96]},
+    b:{head:[68,80],sh:[82,90],hip:[130,106],knee:[155,78],ankle:[178,106],elbow:[86,74],hand:[72,78]}},
+  toetouch:{cap:['다리 수직, 팔 위로','손끝을 발끝 쪽으로'],
+    a:{...B,knee:[131,72],ankle:[133,40],elbow:[72,86],hand:[74,64]},
+    b:{head:[70,78],sh:[84,88],hip:[130,106],knee:[131,72],ankle:[133,40],elbow:[102,70],hand:[122,50]}},
+  bicycle:{cap:['한쪽 무릎 당기기','반대쪽으로 교대'],
+    a:{head:[66,82],sh:[80,92],hip:[130,106],knee:[108,78],ankle:[134,84],knee2:[158,98],ankle2:[188,94],elbow:[80,74],hand:[66,80]},
+    b:{head:[66,82],sh:[82,90],hip:[130,106],knee:[158,98],ankle:[188,94],knee2:[108,78],ankle2:[134,84],elbow:[82,72],hand:[66,80]}},
+  heeltouch:{cap:['어깨 살짝 든 자세','옆으로 굽혀 뒤꿈치 터치'],
+    a:{head:[66,84],sh:[80,94],hip:[130,106],knee:[152,76],ankle:[168,106],elbow:[100,100],hand:[120,102]},
+    b:{head:[70,86],sh:[84,95],hip:[130,106],knee:[152,76],ankle:[168,106],elbow:[118,102],hand:[156,104]}},
+  legraise:{cap:['다리를 바닥 바로 위로','90도까지 들어 올리기'],
+    a:{...B,...ARMS_FLOOR,knee:[160,102],ankle:[190,98]},
+    b:{...B,...ARMS_FLOOR,knee:[132,76],ankle:[134,46]}},
+  reverse:{cap:['무릎 90도 테이블탑','골반 말아 무릎을 가슴 쪽으로'],
+    a:{...B,...ARMS_FLOOR,knee:[130,76],ankle:[158,76]},
+    b:{...B,...ARMS_FLOOR,hip:[124,96],knee:[104,70],ankle:[128,64]}},
+  flutter:{cap:['다리를 15~20cm 들기','위아래로 번갈아 차기'],
+    a:{...B,...ARMS_FLOOR,knee:[160,94],ankle:[190,84],knee2:[160,100],ankle2:[190,104]},
+    b:{...B,...ARMS_FLOOR,knee:[160,100],ankle:[190,104],knee2:[160,94],ankle2:[190,84]}},
+  kneetuck:{cap:['상체 45도, 다리 뻗기','무릎을 가슴 쪽으로'],
+    a:{head:[66,58],sh:[78,70],hip:[112,106],knee:[142,92],ankle:[174,84],elbow:[76,88],hand:[72,106]},
+    b:{head:[78,56],sh:[88,68],hip:[112,106],knee:[122,70],ankle:[144,86],elbow:[82,88],hand:[72,106]}},
+  cobra:{cap:['엎드려 손은 어깨 아래','팔을 펴고 가슴 들기'],
+    a:{head:[52,100],sh:[70,104],hip:[130,106],knee:[160,106],ankle:[190,106],elbow:[84,94],hand:[72,108]},
+    b:{head:[62,60],sh:[76,74],hip:[130,106],knee:[160,106],ankle:[190,106],elbow:[75,92],hand:[72,108]}}
+};
+const lerpP=(a,b,t)=>{const o={};for(const k in a){const q=b[k]||a[k];o[k]=[a[k][0]+(q[0]-a[k][0])*t,a[k][1]+(q[1]-a[k][1])*t]}for(const k in b)if(!o[k])o[k]=b[k];return o};
+function figBody(p,zone){
+  const ln=(a,b,c)=>a&&b?`<line class="${c}" x1="${a[0].toFixed(1)}" y1="${a[1].toFixed(1)}" x2="${b[0].toFixed(1)}" y2="${b[1].toFixed(1)}"></line>`:'';
+  const f=zone==='upper'?.3:zone==='lower'?.75:.55;
+  const g=[p.sh[0]+(p.hip[0]-p.sh[0])*f,p.sh[1]+(p.hip[1]-p.sh[1])*f];
+  return `<rect class="mat" x="18" y="112" width="204" height="5" rx="2.5"></rect>`+
+    `<ellipse class="glow" cx="${g[0].toFixed(1)}" cy="${g[1].toFixed(1)}" rx="17" ry="12"></ellipse>`+
+    ln(p.hip,p.knee2,'back')+ln(p.knee2,p.ankle2,'back')+
+    ln(p.sh,p.hip,'torso')+ln(p.hip,p.knee,'limb')+ln(p.knee,p.ankle,'limb')+
+    ln(p.sh,p.elbow,'limb')+ln(p.elbow,p.hand,'limb')+
+    `<circle class="head" cx="${p.head[0].toFixed(1)}" cy="${p.head[1].toFixed(1)}" r="9.5"></circle>`;
+}
+function figSVG(id,which,extra=''){const P=POSE[id];return `<svg class="fig" viewBox="0 20 240 102" role="img" aria-label="${EX[id].name} ${P.cap[which==='a'?0:1]}" ${extra}>${figBody(P[which],EX[id].zone)}</svg>`}
+
+/* how-to sheet */
+let lastFocus=null,figRAF=null,figPlay=true,figT0=0;
+const reduceMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function animFig(id){
+  cancelAnimationFrame(figRAF);const el=$('figAnim');if(!el)return;const P=POSE[id],z=EX[id].zone;
+  if(!figPlay){el.innerHTML=figBody(P.b,z);return}
+  const step=now=>{if(!figT0)figT0=now;const ph=((now-figT0)%2600)/2600;
+    const t=ph<.4?(1-Math.cos(ph/.4*Math.PI))/2:ph<.5?1:ph<.9?(1+Math.cos((ph-.5)/.4*Math.PI))/2:0;
+    el.innerHTML=figBody(lerpP(P.a,P.b,t),z);figRAF=requestAnimationFrame(step)};
+  figRAF=requestAnimationFrame(step);
+}
+function openHow(id){const e=EX[id],z=ZONE[e.zone],P=POSE[id];lastFocus=document.activeElement;
+  const c=$('sheetCard');c.style.setProperty('--z',z.v);figPlay=!reduceMotion;figT0=0;
+  c.innerHTML=`<span class="tag" style="color:var(--z)">${z.label}</span><h3 id="sheetTitle">${e.name}</h3>
+    <div class="fig-wrap"><svg class="fig" id="figAnim" viewBox="0 20 240 102" role="img" aria-label="${e.name} 동작 애니메이션"></svg>
+      <div class="fig-ctrl"><span><i></i>${e.zone==='cobra'?'늘어나는 부위':'힘이 들어가는 부위'}</span><button class="mini" id="figToggle">${figPlay?'일시정지':'동작 재생'}</button></div>
+      <div class="fig-steps"><figure>${figSVG(id,'a')}<figcaption>① ${P.cap[0]}</figcaption></figure><figure>${figSVG(id,'b')}<figcaption>② ${P.cap[1]}</figcaption></figure></div></div>
+    <ol>${e.steps.map(s=>`<li>${s}</li>`).join('')}</ol><div class="tip"><b>포인트</b> ${e.tip}</div><div class="sheet-act"><a class="mini yt" href="${ytUrl(e.yt)}" target="_blank" rel="noopener">유튜브 시청</a><button class="mini" id="sheetClose">닫기</button></div>`;
+  $('sheet').hidden=false;$('sheetClose').focus();
+  $('figToggle').onclick=()=>{figPlay=!figPlay;$('figToggle').textContent=figPlay?'일시정지':'동작 재생';animFig(id)};
+  animFig(id);
+}
+function closeHow(){cancelAnimationFrame(figRAF);$('sheet').hidden=true;if(lastFocus)lastFocus.focus()}
+document.addEventListener('click',e=>{const b=e.target.closest('[data-how]');if(b){openHow(b.dataset.how);return}
+  if(e.target.id==='sheetClose'||e.target.id==='sheet')closeHow()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('sheet').hidden)closeHow()});
+
+/* sound */
+let ac=null;
+function beep(f=880,d=.12,v=.18){if(!ac)return;try{const t=ac.currentTime,o=ac.createOscillator(),g=ac.createGain();o.frequency.value=f;g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(ac.destination);o.start(t);o.stop(t+d)}catch(e){}}
+function buzz(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+let wake=null;
+async function keepAwake(){try{wake=await navigator.wakeLock.request('screen')}catch(e){wake=null}}
+
+/* workout engine */
+let S=null,timer=null;
+$('startBtn').addEventListener('click',()=>{
+  try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();ac.resume()}catch(e){}
+  keepAwake();
+  const L=LEVELS[cfg.level];
+  const basePlan=buildPlan(cfg.level);
+  S={plan:basePlan,every:cobraEvery(basePlan.length),i:0,phase:'exercise',total:0,target:L.sets*L.reps,mission:cfg.mission,limit:L.limit,
+     activeMs:0,exStart:Date.now(),phaseEnd:0,phaseLen:0,lastSec:null,count:0,result:null};
+  inWorkout=true;showTab('home');
+  $('wkTarget').textContent=S.target;
+  enterExercise();
+  clearInterval(timer);timer=setInterval(tick,200);
+});
+$('quitBtn').addEventListener('click',()=>{
+  if(!S)return;
+  if(S.phase==='done'){exitWorkout();return}
+  if($('quitBtn').dataset.confirm){finish(false,true);return}
+  $('quitBtn').dataset.confirm='1';$('quitBtn').textContent='한 번 더 누르면 종료됩니다';
+  setTimeout(()=>{if($('quitBtn')){delete $('quitBtn').dataset.confirm;if(S&&S.phase!=='done')$('quitBtn').textContent='그만두기'}},3000);
+});
+function exitWorkout(){clearInterval(timer);S=null;inWorkout=false;try{wake&&wake.release()}catch(e){}
+  $('quitBtn').textContent='그만두기';renderStreak();renderHome();showTab('home')}
+
+function updateTop(){
+  $('wkCount').textContent=S.total;$('mFill').style.width=Math.min(100,S.total/S.target*100)+'%';
+  const clk=$('wkClock');
+  if(S.mission==='time'){
+    const used=S.activeMs+(S.phase==='exercise'?Date.now()-S.exStart:0),rem=S.limit-used/1000;
+    clk.textContent=fmt(rem);clk.classList.toggle('paused',S.phase!=='exercise');clk.classList.toggle('warn',rem<=30&&S.phase==='exercise');
+  }else{clk.textContent='';}
+}
+function ringHTML(sec){return `<div class="ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-bg" cx="60" cy="60" r="54"></circle><circle class="ring-fg" id="ringFg" cx="60" cy="60" r="54"></circle></svg><div class="ring-t"><span class="num" id="ringSec">${sec}</span><small>초</small></div></div>`}
+
+function enterExercise(){
+  S.phase='exercise';S.exStart=Date.now();
+  const p=S.plan[S.i],e=EX[p.id],z=ZONE[e.zone];S.count=p.reps;
+  const ph=$('phase');ph.style.setProperty('--z',z.v);
+  ph.innerHTML=`<p class="ph-k">세트 ${S.i+1} / ${S.plan.length} · ${z.label}</p><h2 class="ph-name">${e.name}</h2><p class="ph-sub">목표 ${p.reps}회</p>
+    <div class="counter"><button id="minus" aria-label="1회 빼기">−</button><output id="cnt" class="num">${S.count}</output><button id="plus" aria-label="1회 더하기">+</button></div>
+    <p class="hint">실제로 한 개수에 맞춘 뒤 완료를 누르세요</p>
+    <button class="cta" id="setDone">세트 완료</button>
+    <div class="row"><button class="mini" data-how="${p.id}">운동방법 설명</button><a class="mini yt" href="${ytUrl(e.yt)}" target="_blank" rel="noopener">유튜브 시청</a></div>`;
+  $('minus').onclick=()=>{S.count=Math.max(0,S.count-1);$('cnt').textContent=S.count};
+  $('plus').onclick=()=>{S.count++;$('cnt').textContent=S.count};
+  $('setDone').onclick=completeSet;
+  beep(660,.15);updateTop();
+}
+function completeSet(){
+  S.total+=S.count;S.activeMs+=Date.now()-S.exStart;
+  beep(990,.18);buzz(80);
+  if(cobraAfter(S.i,S.plan.length,S.every))enterTimed('cobra',cfg.cobra);
+  else enterTimed('rest',cfg.rest);
+}
+function enterTimed(kind,sec){
+  S.phase=kind;S.phaseLen=sec*1000;S.phaseEnd=Date.now()+S.phaseLen;S.lastSec=null;
+  const ph=$('phase');
+  if(kind==='cobra'){const e=EX.cobra;ph.style.setProperty('--z','var(--cobra)');
+    ph.innerHTML=`<p class="ph-k">${S.i+1}세트 완료 · 복근 풀기</p><h2 class="ph-name">코브라 자세</h2>${ringHTML(sec)}
+      <p class="cue">엎드려 팔을 펴고 가슴을 들어 올리세요. 골반은 바닥에 두고, 배가 길게 늘어나는 느낌으로 호흡합니다.</p>
+      <div class="row"><button class="mini" data-how="cobra">운동방법 설명</button><a class="mini yt" href="${ytUrl(e.yt)}" target="_blank" rel="noopener">유튜브 시청</a></div>
+      <div class="btns"><button id="addT">+10초</button><button id="skipT">다음으로</button></div>`;
+  }else{
+    const n=S.plan[S.i+1],e=EX[n.id],z=ZONE[e.zone];ph.style.setProperty('--z','var(--rest)');
+    const toCobra=S.every-((S.i+1)%S.every);
+    ph.innerHTML=`<p class="ph-k">휴식${toCobra<S.every?` · 코브라까지 ${toCobra}세트`:''}</p><h2 class="ph-name">숨 고르기</h2>${ringHTML(sec)}
+      <div class="next" style="--z:${z.v}">다음 · <span class="tag" style="color:var(--z)">${z.label}</span> <b>${e.name}</b> ${n.reps}회</div>
+      <div class="row"><button class="mini" data-how="${n.id}">다음 운동 방법 보기</button></div>
+      <div class="btns"><button id="addT">+10초</button><button id="skipT">바로 시작</button></div>`;
+  }
+  $('addT').onclick=()=>{S.phaseEnd+=10000;S.phaseLen+=10000};
+  $('skipT').onclick=()=>{S.phaseEnd=Date.now()};
+  updateTop();
+}
+function afterTimed(){
+  if(S.phase==='cobra'){
+    if(S.i<S.plan.length-1){enterTimed('rest',cfg.rest)}
+    else if(S.total<S.target){offerExtra()}
+    else finish(true);
+  }else{S.i++;enterExercise()}
+}
+function offerExtra(){
+  S.phase='extra';const need=S.target-S.total;
+  const ph=$('phase');ph.style.setProperty('--z','var(--cobra)');
+  ph.innerHTML=`<p class="ph-k">계획한 세트 완료</p><h2 class="ph-name">${need}회 남았어요</h2><p class="ph-sub">미션 성공까지 ${S.total} / ${S.target}회</p>
+    <button class="cta" id="extraBtn">추가 세트로 채우기</button><button class="ghost" id="endBtn" style="width:100%">여기서 마치기</button>`;
+  $('extraBtn').onclick=()=>{const last=S.plan[S.plan.length-1],id=EX[last.id].zone==='upper'?LOWER[0]:UPPER[0];
+    S.plan.push({id,reps:need});enterTimed('rest',cfg.rest)};
+  $('endBtn').onclick=()=>finish(false);
+  updateTop();
+}
+function tick(){
+  if(!S||S.phase==='done')return;
+  updateTop();
+  if(S.mission==='time'&&S.phase==='exercise'){
+    const used=S.activeMs+Date.now()-S.exStart;
+    if(used>=S.limit*1000){S.activeMs=S.limit*1000;finish(false);return}
+  }
+  if(S.phase==='cobra'||S.phase==='rest'){
+    const rem=S.phaseEnd-Date.now(),sec=Math.max(0,Math.ceil(rem/1000));
+    const fg=$('ringFg'),t=$('ringSec');
+    if(t)t.textContent=sec;
+    if(fg)fg.style.strokeDashoffset=339.29*(1-Math.max(0,rem)/S.phaseLen);
+    if(sec!==S.lastSec){if(sec>0&&sec<=3)beep(520,.08,.12);S.lastSec=sec}
+    if(rem<=0){buzz([60,60,60]);afterTimed()}
+  }
+}
+function finish(success,quit){
+  const prevPhase=S.phase;S.phase='done';
+  const L=LEVELS[cfg.level],usedSec=Math.round(S.activeMs/1000);
+  const rec=hist[TODAY]||{reps:0,success:false,runs:[]};
+  rec.reps+=S.total;rec.success=rec.success||success;rec.runs=(rec.runs||[]).concat({m:S.mission,lv:cfg.level,reps:S.total,ok:success,sec:usedSec});
+  hist[TODAY]=rec;save('abs.hist',hist);
+  const ph=$('phase');ph.style.setProperty('--z',success?'var(--good)':'var(--cobra)');
+  let sub;
+  if(S.mission==='time') sub=success?`운동 시간 ${fmt(usedSec)} · 제한 ${fmt(L.limit)}보다 ${fmt(L.limit-usedSec)} 빨랐어요`:(quit||prevPhase==='extra'?`운동 시간 ${fmt(usedSec)}`:`제한 시간 ${fmt(L.limit)}이 끝났어요`);
+  else sub=success?'오늘 목표 개수를 모두 채웠어요':'오늘 한 개수도 기록에 남았어요';
+  ph.innerHTML=`<span class="badge">${success?'미션 성공':'미션 종료'}</span><p class="ph-k">${S.mission==='time'?'타임어택':'개수 미션'} · ${L.label}</p>
+    <div class="result-big num">${S.total}<small style="font-size:24px;color:var(--muted)"> / ${S.target}회</small></div><p class="ph-sub">${sub}</p>
+    <button class="cta" id="homeBtn">처음으로</button>`;
+  $('homeBtn').onclick=exitWorkout;$('quitBtn').textContent='닫기';
+  beep(success?1180:440,.35);updateTop();$('wkClock').classList.remove('warn');
+}
+
+/* log */
+function renderLog(){
+  const keys=Object.keys(hist).sort().reverse();
+  const month=TODAY.slice(0,7),okMonth=keys.filter(k=>k.startsWith(month)&&hist[k].success).length;
+  const total=keys.reduce((s,k)=>s+(hist[k].reps||0),0);
+  let days='';const d=new Date();d.setDate(d.getDate()-13);
+  for(let i=0;i<14;i++){const k=keyOf(d),h=hist[k];
+    days+=`<div class="day${k===TODAY?' today':''}"><span class="dot${h?(h.success?' ok':' part'):''}" title="${k}"></span>${d.getMonth()+1}/${d.getDate()}</div>`;d.setDate(d.getDate()+1)}
+  const list=keys.slice(0,10).map(k=>{const h=hist[k];const [y,m,dd]=k.split('-');
+    return `<li><span>${+m}월 ${+dd}일</span><span class="num">${h.reps}회</span><span class="${h.success?'ok':'no'}">${h.success?'성공':'도전'}</span></li>`}).join('');
+  $('v-log').innerHTML=`<div class="stats"><div class="stat"><span class="num">${streak()}</span><span>연속 성공일</span></div><div class="stat"><span class="num">${okMonth}</span><span>이번 달 성공</span></div><div class="stat"><span class="num">${total.toLocaleString()}</span><span>누적 개수</span></div></div>
+    <div><h2 class="lbl">최근 2주</h2><div class="days">${days}</div></div>
+    <div class="legend"><span><i style="background:var(--good)"></i>미션 성공</span><span><i style="background:color-mix(in srgb,var(--cobra) 40%,transparent)"></i>도전만 함</span></div>
+    <div><h2 class="lbl">날짜별 기록</h2>${list?`<ul class="hist">${list}</ul>`:'<p class="empty">아직 기록이 없어요. 오늘의 미션을 시작하면 여기에 쌓입니다.</p>'}</div>
+    <p class="note">기록은 이 기기의 브라우저에만 저장됩니다.</p>`;
+}
+
+renderStreak();renderHome();renderGuide();
+</script>
+
+</body></html>
